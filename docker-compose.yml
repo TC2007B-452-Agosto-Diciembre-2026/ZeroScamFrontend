@@ -1,0 +1,12 @@
+services:
+  admin:
+    build:
+      context: .
+      args:
+        # URL de la API tal como la ve el NAVEGADOR de quien usa el panel
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+    image: zeroscam-admin:latest
+    container_name: zeroscam-admin
+    ports:
+      - "${ADMIN_PORT:-3001}:3001"
+    restart: unless-stopped
