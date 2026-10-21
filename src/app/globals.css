@@ -1,0 +1,417 @@
+@import 'tailwindcss';
+
+/* La familia del login en todo el panel, servida desde el propio panel (la red
+   puede no tener salida). Atkinson Hyperlegible distingue 0/O, 1/l/I y rn/m:
+   justo lo que hace falta para leer dominios falsos. */
+@import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
+@import '@fontsource-variable/atkinson-hyperlegible-mono/wght.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- Tokens ----------
+   Panel de trabajo: neutros fríos teñidos del azul de la app, y su ámbar solo
+   para la acción principal, la selección y los avisos. */
+:root {
+  --bg: #fbfbfc;
+  --panel: #f5f6f8;
+  --surface: #ffffff;
+  --sunk: #f2f3f6;
+  --ink: #0a1330;
+  --ink-2: #3f4863;
+  --muted: #687089;
+  --line: #dcdfe7;
+  --line-strong: #b9bfcd;
+  /* Borde de los campos: con contraste propio, como en el login. */
+  --field: #687089;
+  --accent: #f5a623;
+  --accent-ink: #94560a;
+  --accent-wash: #fdf1d9;
+  --on-accent: #0a1330;
+  --danger: #b42318;
+  --danger-wash: #fdecea;
+  --ok: #1f7a4a;
+
+  --st-recibido: #3d5f9e;
+  --st-revision: #a8650a;
+  --st-validado: #1f7a4a;
+  --st-rechazado: #b42318;
+  --st-canalizado: #5b46b0;
+
+  /* Riesgo: una sola tinta de clara a oscura, porque es una magnitud ordenada. */
+  --risk-0: #c3c8d4;
+  --risk-1: #e9c478;
+  --risk-2: #e2952a;
+  --risk-3: #c4551c;
+  --risk-4: #8c1d18;
+
+  --chart-1: #0a1330;
+  --chart-grid: #e7e9ef;
+
+  /* Elevación por sombra en capas, no por borde (el anillo es la primera capa). */
+  --ring: 0 0 0 1px rgb(10 19 48 / 0.08);
+  --shadow-card: var(--ring), 0 1px 2px -1px rgb(10 19 48 / 0.08), 0 2px 4px 0 rgb(10 19 48 / 0.04);
+  --shadow-pop: var(--ring), 0 4px 10px -2px rgb(10 19 48 / 0.1), 0 16px 40px -8px rgb(10 19 48 / 0.18);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0a1330;
+  --panel: #080f28;
+  --surface: #101b40;
+  --sunk: #0d1737;
+  --ink: #f1f3f9;
+  --ink-2: #bcc3d8;
+  --muted: #8c95b4;
+  --line: #1a2650;
+  --line-strong: #2a3868;
+  --field: #5d6994;
+  --accent: #f5a623;
+  --accent-ink: #f7bb57;
+  --accent-wash: #2f2408;
+  --danger: #ff7a70;
+  --danger-wash: #3a1513;
+  --ok: #5fcf91;
+
+  --st-recibido: #8fb1ee;
+  --st-revision: #f0b455;
+  --st-validado: #5fcf91;
+  --st-rechazado: #ff7a70;
+  --st-canalizado: #b3a4ff;
+
+  /* En oscuro lo más grave es lo más claro: es lo que más resalta. */
+  --risk-0: #38457a;
+  --risk-1: #8a611a;
+  --risk-2: #c98a1c;
+  --risk-3: #f5a623;
+  --risk-4: #ffd98f;
+
+  --chart-1: #f5a623;
+  --chart-grid: #1a2650;
+
+  --ring: 0 0 0 1px rgb(255 255 255 / 0.08);
+  --shadow-card: var(--ring);
+  --shadow-pop: 0 0 0 1px rgb(255 255 255 / 0.1), 0 16px 48px -8px rgb(0 0 0 / 0.7);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-wash: var(--accent-wash);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+  --color-danger-wash: var(--danger-wash);
+  --color-ok: var(--ok);
+
+  --color-field: var(--field);
+
+  --font-sans: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono Variable', ui-monospace, 'SF Mono', monospace;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-pop: var(--shadow-pop);
+
+  --ease-out: var(--ease-out);
+  --ease-in-out: var(--ease-in-out);
+  --ease-drawer: var(--ease-drawer);
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scrollbar-color: var(--line-strong) transparent;
+    scrollbar-width: thin;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  /* Lo que el navegador pinta por su cuenta también es parte del diseño. */
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 35%, transparent);
+    color: var(--ink);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--accent-ink);
+  }
+
+  /* El mismo foco del login: ámbar y grueso, se ve sobre cualquier fondo. */
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    text-underline-offset: 3px;
+  }
+
+  button {
+    touch-action: manipulation;
+  }
+
+  /* Cifras que cambian o se comparan en columna: mismo ancho por dígito. */
+  .tnum,
+  number-flow-react {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Paneles flotantes (menú, selector, tooltip): salen de lo que los abrió. */
+  .pop {
+    transform-origin: var(--transform-origin);
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 180ms var(--ease-out);
+  }
+  .pop[data-starting-style],
+  .pop[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  .pop[data-instant] {
+    transition-duration: 0ms;
+  }
+
+  /* El diálogo no sale de ningún botón: se queda centrado. */
+  .modal {
+    transition:
+      opacity 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+  .modal[data-starting-style],
+  .modal[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  .backdrop {
+    transition: opacity 220ms var(--ease-out);
+  }
+  .backdrop[data-starting-style],
+  .backdrop[data-ending-style] {
+    opacity: 0;
+  }
+
+  /* Carga: un brillo que cruza, no un parpadeo. */
+  .skeleton {
+    background: linear-gradient(
+        100deg,
+        transparent 30%,
+        color-mix(in oklab, var(--ink) 6%, transparent) 50%,
+        transparent 70%
+      )
+      0 0 / 200% 100%,
+      color-mix(in oklab, var(--ink) 7%, transparent);
+    animation: shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 120% 0, 0 0;
+    }
+    to {
+      background-position: -80% 0, 0 0;
+    }
+  }
+
+  .spinner {
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* El contenido que llega tras una carga aparece, no salta: sube un poco y
+     se enfoca, como cada paso del login. */
+  .arrive {
+    animation: rise 320ms var(--ease-out) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+      filter: blur(4px);
+    }
+  }
+
+  /* Filas que llegan juntas: en cascada, pero corta. Solo las primeras; las
+     de más abajo no se ven al llegar y no tienen por qué esperar. */
+  .stagger > * {
+    animation: rise 300ms var(--ease-out) both;
+  }
+  .stagger > :nth-child(2) { animation-delay: 25ms; }
+  .stagger > :nth-child(3) { animation-delay: 50ms; }
+  .stagger > :nth-child(4) { animation-delay: 75ms; }
+  .stagger > :nth-child(5) { animation-delay: 100ms; }
+  .stagger > :nth-child(6) { animation-delay: 125ms; }
+  .stagger > :nth-child(7) { animation-delay: 150ms; }
+  .stagger > :nth-child(n + 8) { animation-delay: 175ms; }
+
+  /* Brillo que cruza la acción principal al pasar el puntero (del login). */
+  .sheen {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.5), transparent);
+    transform: translateX(-120%) skewX(-16deg);
+    pointer-events: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .group:enabled:hover .sheen {
+      animation: sheen 900ms var(--ease-out);
+    }
+  }
+  @keyframes sheen {
+    to {
+      transform: translateX(340%) skewX(-16deg);
+    }
+  }
+
+  /* El azul profundo del escenario del login, quieto: ámbar abajo, azul arriba. */
+  .abyss {
+    --abyss: #050b22;
+    background:
+      radial-gradient(120% 50% at 0% 100%, rgb(245 166 35 / 0.09), transparent 60%),
+      radial-gradient(110% 45% at 100% 0%, rgb(61 95 158 / 0.24), transparent 70%),
+      var(--abyss);
+  }
+
+  /* Lo que delata un dominio falso, marcado igual que en el login. */
+  .domain-mark {
+    border-radius: 3px;
+    background: rgb(245 166 35 / 0.18);
+    color: var(--accent-ink);
+    box-shadow: 0 0 0 2px rgb(245 166 35 / 0.18);
+  }
+}
+
+/* Cada página entra en cascada: encabezado, filtros y contenido. Va en el
+   <main> del panel, así cualquier página nueva lo hereda sin hacer nada. */
+.page-flow > * {
+  animation: rise 380ms var(--ease-out) both;
+}
+.page-flow > :nth-child(2) { animation-delay: 40ms; }
+.page-flow > :nth-child(3) { animation-delay: 80ms; }
+.page-flow > :nth-child(n + 4) { animation-delay: 120ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pop,
+  .modal {
+    transition-property: opacity;
+  }
+  .pop[data-starting-style],
+  .pop[data-ending-style],
+  .modal[data-starting-style],
+  .modal[data-ending-style] {
+    transform: none;
+  }
+  .arrive,
+  .stagger > *,
+  .page-flow > * {
+    animation-name: fade-only;
+  }
+  .skeleton,
+  .sheen {
+    animation: none !important;
+  }
+  @keyframes fade-only {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+
+/* Las barras de las gráficas crecen una vez desde su base al aparecer. */
+.bar {
+  animation: bar-grow 500ms var(--ease-out) both;
+}
+@keyframes bar-grow {
+  from {
+    clip-path: inset(0 100% 0 0 round 999px);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 999px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}
+
+/* Login: el cero tachado se traza una sola vez al llegar. */
+.login-mark ellipse,
+.login-mark path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 900ms var(--ease-in-out) 150ms forwards;
+}
+.login-mark path {
+  animation-duration: 500ms;
+  animation-delay: 800ms;
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.caret-blink {
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-mark ellipse,
+  .login-mark path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
