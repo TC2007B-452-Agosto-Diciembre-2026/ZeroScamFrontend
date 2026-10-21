@@ -1,0 +1,258 @@
+/* Inicio de sesión: a la izquierda un banco de inspección que hace lo mismo
+   que el panel (encontrar el carácter impostor en un dominio); a la derecha,
+   la hoja del formulario. Todo lo de aquí solo se usa en /login. */
+
+/* ---------- Base propia de /login ----------
+   El diseño se pensó con la tipografía Atkinson, base de 16px y unos neutros
+   un poco más marcados. Se acota a esta pantalla para no cambiar el resto del panel. */
+
+:root:has(.login-page) {
+  font-size: 16px;
+}
+
+.login-page {
+  --field: #687089;
+  --font-sans: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono Variable', ui-monospace, 'SF Mono', monospace;
+  font-family: var(--font-sans);
+}
+/* Solo en el tema claro: en el oscuro se quedan los valores del panel. */
+:root:not(.dark) .login-page {
+  --bg: #ffffff;
+  --sunk: #f2f3f6;
+  --line: #dcdfe7;
+  --line-strong: #b9bfcd;
+}
+.dark .login-page {
+  --field: #5d6994;
+}
+.login-page .font-mono {
+  font-family: var(--font-mono);
+}
+
+.stage {
+  --abyss: #050b22;
+  --mist: #8c95b4;
+  background:
+    radial-gradient(90% 70% at 0% 100%, rgb(245 166 35 / 0.08), transparent 60%),
+    radial-gradient(70% 60% at 100% 0%, rgb(61 95 158 / 0.22), transparent 70%),
+    var(--abyss);
+  color: #f1f3f9;
+}
+
+/* ---------- Campo de dominios falsos ---------- */
+
+.domain-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 2.6;
+  white-space: nowrap;
+  color: rgb(140 149 180 / 0.17);
+  user-select: none;
+}
+.domain-field--lens {
+  color: rgb(241 243 249 / 0.78);
+}
+
+.stage-field {
+  animation: field-in 1.4s var(--ease-out) both;
+  mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+}
+@keyframes field-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.domain-row {
+  display: flex;
+  width: max-content;
+  animation: drift var(--drift, 100s) linear infinite;
+}
+.domain-row[data-dir='rev'] {
+  animation-direction: reverse;
+}
+@keyframes drift {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.domain {
+  padding-right: 3.25rem;
+}
+.domain-field--lens .domain-mark {
+  border-radius: 3px;
+  background: rgb(245 166 35 / 0.2);
+  color: var(--accent);
+  box-shadow: 0 0 0 2px rgb(245 166 35 / 0.2);
+}
+
+/* Lo que está a los lados se apaga para que el ejemplo se lea primero. */
+.stage-vignette {
+  background:
+    linear-gradient(90deg, var(--abyss) 0%, rgb(5 11 34 / 0.55) 45%, transparent 80%),
+    linear-gradient(0deg, var(--abyss) 0%, transparent 30%);
+}
+
+/* ---------- Lupa ----------
+   Un círculo que se mueve con el puntero; dentro, otra copia del campo
+   aumentada alrededor del mismo punto. Solo cambian transformaciones: no se
+   vuelve a pintar el texto en cada cuadro. */
+
+.lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--lr, 150px) * 2);
+  height: calc(var(--lr, 150px) * 2);
+  overflow: hidden;
+  border-radius: 50%;
+  background: #08133a;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.16),
+    0 0 0 6px rgb(255 255 255 / 0.025),
+    0 30px 80px -24px rgb(0 0 0 / 0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms var(--ease-out);
+  will-change: transform;
+}
+.lens::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 28% 22%, rgb(255 255 255 / 0.1), transparent 42%);
+  box-shadow: inset 0 0 48px rgb(245 166 35 / 0.08);
+}
+.stage[data-lens] .lens {
+  opacity: 1;
+}
+@media (width < 64rem) {
+  .lens {
+    display: none;
+  }
+}
+.lens-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--sw, 100%);
+  height: var(--sh, 100%);
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* ---------- Ejemplo grande ---------- */
+
+.specimen-box {
+  container-type: inline-size;
+}
+
+/* El tamaño sale del largo del dominio: siempre cabe en una línea. */
+.specimen-domain {
+  font-family: var(--font-mono);
+  font-size: min(5.25rem, calc((100cqi - 0.25rem) / (var(--len) * 0.62)));
+  font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.glyph {
+  opacity: 0.28;
+  transition:
+    opacity 220ms var(--ease-out),
+    color 220ms var(--ease-out);
+}
+.glyph[data-on] {
+  opacity: 1;
+}
+/* Los corchetes de "[.]" quedan atrás: son del panel, no del dominio. */
+.glyph[data-on][data-punct] {
+  opacity: 0.38;
+}
+[data-mark] .glyph[data-on] {
+  opacity: 1;
+}
+
+.beam {
+  position: absolute;
+  top: -14%;
+  bottom: -14%;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--accent);
+  box-shadow:
+    0 0 16px 1px rgb(245 166 35 / 0.7),
+    0 0 48px 4px rgb(245 166 35 / 0.25);
+  pointer-events: none;
+}
+.beam::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 2px;
+  bottom: 0;
+  width: 5rem;
+  background: linear-gradient(90deg, transparent, rgb(245 166 35 / 0.16));
+}
+
+.annot {
+  position: absolute;
+  bottom: calc(100% + 0.12em);
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: clamp(13px, 1.15vw, 16px);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--accent);
+}
+.annot::before {
+  content: '';
+  width: 1px;
+  height: 1.6em;
+  background: var(--accent);
+}
+
+/* ---------- Avance de los ejemplos ---------- */
+
+.progress-fill {
+  transform-origin: left;
+  animation: progress-fill var(--d, 7000ms) linear both;
+}
+[data-paused] .progress-fill {
+  animation-play-state: paused;
+}
+@keyframes progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* ---------- Formulario ---------- */
+
+.countdown-ring {
+  transition: stroke-dashoffset 250ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-field,
+  .domain-row {
+    animation: none !important;
+  }
+  .progress-fill {
+    animation: none;
+  }
+  .glyph {
+    transition: none;
+  }
+}
